@@ -31,6 +31,37 @@
     }
   ],
   "examples": [
-    
+    {
+      "name": "Sensor_Generic_DefaultUnit",
+      "base": "examples/PlatformIO/Sensor_Generic_DefaultUnit"
+    },
+    {
+      "name": "Sensor_Generic_Custom",
+      "base": "examples/PlatformIO/Sensor_Generic_Custom"
+    },
+    {
+      "name": "Sensor_Diag_Constructors",
+      "base": "examples/PlatformIO/Sensor_Diag_Constructors"
+    },
+    {
+      "name": "Diagnostic_AutoSensors",
+      "base": "examples/PlatformIO/Diagnostic_AutoSensors"
+    },
+    {
+      "name": "BinarySensor_Generic",
+      "base": "examples/PlatformIO/BinarySensor_Generic"
+    },
+    {
+      "name": "Button_Generic",
+      "base": "examples/PlatformIO/Button_Generic"
+    },
+    {
+      "name": "Button_Restart",
+      "base": "examples/PlatformIO/Button_Restart"
+    },
+    {
+      "name": "Advanced_MultiEntity_With_Timers",
+      "base": "examples/PlatformIO/Advanced_MultiEntity_With_Timers"
+    }
   ]
 }

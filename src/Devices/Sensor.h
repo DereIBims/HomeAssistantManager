@@ -10,7 +10,6 @@ namespace HA {
 
 public:
     SensorBase(Manager *mgr, const char *name, const char *sensorClass, const char *unit, const char *StateClass = "measurement");
-
     void setValue(float VALUE, int decimalPlaces = 1);
     void setValue(int VALUE);
     void setValue(long VALUE);

@@ -1,246 +1,147 @@
-# HASSDevice Library
+# HomeAssistantManager (ESP32)
 
-A comprehensive Home Assistant MQTT device wrapper library for ESP32 microcontrollers with automatic discovery support.
+Home Assistant MQTT auto-discovery library for ESP32. It provides a small set of entity types (sensor, binary sensor, button) with simple APIs and diagnostic helpers.
 
 ## Features
 
-- **Auto-Discovery**: Automatically registers devices with Home Assistant via MQTT discovery.
-- **Device Classes**: Supports all major Home Assistant device classes including sensors, binary sensors, lights, switches, covers, and fans.
-- **Hardware Integration**: Provides callbacks for physical hardware control without managing pins directly.
-- **Device Grouping**: Groups all entities under a single HA device with shared metadata.
-- **WiFi & MQTT Management**: Handles WiFi connection and MQTT communication.
-- **Easy Configuration**: Simple constructors and setters for device setup.
+- **Auto-Discovery**: Registers entities via Home Assistant MQTT discovery topics.
+- **Device Grouping**: All entities share a single HA device (same identifiers + metadata).
+- **Diagnostics**: Built-in auto-updated sensors for RSSI, uptime, free heap, and reset reason.
+- **Command Callbacks**: Button entities can trigger callbacks from Home Assistant.
+- **ESP32-only**: Uses ESP32 WiFi and reset APIs.
 
-## Supported Device Types
+## Supported Entity Types
 
-- **Sensors**: Temperature, humidity, illuminance, pressure, etc.
-- **Binary Sensors**: Motion, door/window, presence, etc.
-- **Lights**: On/off, brightness, RGB color control.
-- **Switches**: Simple on/off switches.
-- **Covers**: Blinds, curtains with position and state control.
-- **Fans**: Speed and preset mode control.
+- **Sensor**: `HA::Sensor::Generic`, `HA::Sensor::Diag`, plus auto-diagnostic sensor variants.
+- **Binary Sensor**: `HA::BinarySensor::Generic`.
+- **Button**: `HA::Button::Generic`, `HA::Button::Restart`.
 
 ## Dependencies
 
 - [PubSubClient](https://github.com/knolleary/pubsubclient) (^2.8)
 - [ArduinoJson](https://github.com/bblanchon/ArduinoJson) (^7.0)
+- [ArduinoLog](https://github.com/thijse/ArduinoLog) (^1.0.1)
 
-## Installation
+## Installation (PlatformIO)
 
-### PlatformIO
-
-Add to your `platformio.ini`:
+Add to your [platformio.ini](platformio.ini):
 
 ```ini
 lib_deps =
-    https://github.com/yourusername/HASSDevice.git
+        https://github.com/DereIBims/HomeAssistantManager.git
 ```
 
-### Manual
-
-Copy the `HASSDevice` folder to your Arduino libraries directory.
-
-## Usage
-
-### Basic Setup
+## Quick Start
 
 ```cpp
-#include <WiFi.h>
-#include <HASSDevice.h>
+#include "Devices/Button.h"
+#include "Devices/BinarySensor.h"
+#include "Devices/Sensor.h"
+#include "HomeAssistantManager.h"
 
-// Option 1: Default constructor with setters
-HASSDevice::HASSManager manager;
-manager.setWifiCredentials("your-ssid", "your-password");
-manager.setMqttServer("your-mqtt-server");
-manager.setMqttPort(1883);
-manager.setMqttCredentials("mqtt-user", "mqtt-password");
-manager.setDeviceInfo("My ESP32 Device", "ESP32", "1.0.0");
+// Manager requires WiFi + MQTT server, log level is optional
+HA::Manager hassManager("your-ssid", "your-password", "mqtt-host", LOG_LEVEL_INFO);
 
-// Option 2: MQTT-only constructor
-HASSDevice::HASSManager manager("mqtt-server", 1883, "mqtt-user", "mqtt-password");
-manager.setWifiCredentials("ssid", "password");
+// Optional MQTT settings
+// hassManager.setMqttPort(1883);
+// hassManager.setMqttCredentials("mqtt-user", "mqtt-pass");
 
-// Option 3: Full constructor (original)
-HASSDevice::HASSManager manager("ssid", "password", "mqtt-server", 1883, "user", "pass", "Device Name");
+// Example entities
+HA::Sensor::Generic tempSensor(&hassManager, "Temperature", HA::Temperature, HA::MEASUREMENT);
+HA::BinarySensor::Generic doorSensor(&hassManager, "Door", HA::Door);
+HA::Button::Generic testButton(&hassManager, "Test Button");
+
+void onTestButton() {
+    Serial.println("Button pressed");
+}
 
 void setup() {
-    // Enable OTA updates (optional)
-    manager.enableOTA("ota_password", "my-esp32-device");
-    
-    // Enable remote monitoring (optional)
-    manager.enableRemoteLogging();  // Publish logs to MQTT
-    manager.enableTelnet();         // Enable telnet server on port 23
-    
-    if (!manager.begin()) {
-        Serial.println("Failed to connect to Home Assistant!");
-        while (true) delay(1000);  // Halt
+    Serial.begin(115200);
+
+    testButton.setCommandCallback(onTestButton);
+
+    if (!hassManager.begin("ESP32_HASS", "MyCompany", "ESP32", "1.0.0")) {
+        while (true) {
+            delay(1000);
+        }
     }
-
-    // Create devices
-    auto sensor = new HASSDevice::Sensor(&manager, "Temperature", HASSDevice::SensorClass::Temperature);
-    sensor->setState(23.5);
 }
-```
 
-### Device Classes
-
-Use the provided constants for device classes:
-
-```cpp
-// Sensors with default units
-HASSDevice::Sensor temperature(&manager, "Temp", HASSDevice::SensorClass::Temperature); // °C
-HASSDevice::Sensor humidity(&manager, "Humidity", HASSDevice::SensorClass::Humidity); // %
-HASSDevice::Sensor battery(&manager, "Battery", HASSDevice::SensorClass::Battery); // %
-
-// Binary Sensors
-HASSDevice::BinarySensor motion(&manager, "Motion", HASSClass::Motion);
-
-// Lights, Switches, Covers, Fans
-HASSDevice::Light light(&manager, "Light");
-HASSDevice::Switch switch(&manager, "Switch");
-HASSDevice::Cover cover(&manager, "Cover");
-HASSDevice::Fan fan(&manager, "Fan");
-```
-
-### Remote Monitoring
-
-The library provides two ways to remotely monitor your ESP32 device:
-
-#### MQTT Logging
-
-Publish all log messages to MQTT topics for remote monitoring via Home Assistant or any MQTT client:
-
-```cpp
-// Enable MQTT logging (logs go to homeassistant/{deviceId}/logs)
-manager.enableRemoteLogging();
-
-// Or specify custom topic
-manager.enableRemoteLogging("my/custom/logs/topic");
-
-// Disable MQTT logging (back to serial only)
-manager.disableRemoteLogging();
-```
-
-Log messages are published in real-time and can be monitored using:
-- MQTT clients like MQTT Explorer
-- Home Assistant MQTT integration
-- Custom dashboards
-
-#### Telnet Server
-
-Access the device console remotely via telnet for debugging and monitoring:
-
-```cpp
-// Enable telnet server on default port 23
-manager.enableTelnet();
-
-// Or specify custom port
-manager.enableTelnet(2323);
-
-// Disable telnet server
-manager.disableTelnet();
-```
-
-Connect using: `telnet <esp32-ip> [port]`
-
-Available telnet commands:
-- `help` - Show available commands
-- `status` - Show device status
-- `logs` - Show logging information
-- `devices` - List all devices
-- `wifi` - Show WiFi information
-- `mqtt` - Show MQTT connection info
-- `reboot` - Reboot the device
-- `exit` - Disconnect from telnet
-
-#### Mirroring Serial Output
-
-To mirror `Serial.print()` and `Serial.println()` output to telnet clients:
-
-```cpp
 void loop() {
-    // Your code...
-    Serial.println("This goes to serial and telnet clients");
-    
-    // Or explicitly send to telnet only
-    manager.sendToTelnet("This goes only to telnet clients");
+    hassManager.loop();
+    tempSensor.setValue(23.5, 1);
+    doorSensor.setValue(true);
+    delay(5000);
 }
 ```
 
-**Note:** When remote logging is enabled, all ArduinoLog output is automatically published to MQTT. For Serial output, you need to use the `sendToTelnet()` method or modify your Serial.print calls.
+## Diagnostic Sensors
 
-## API Reference
+These update automatically in `Manager::loop()`:
 
-### HASSManager
+```cpp
+HA::Sensor::Diag::AutoRSSI rssi(&hassManager, "RSSI");
+HA::Sensor::Diag::AutoUptime uptime(&hassManager, "Uptime");
+HA::Sensor::Diag::AutoFreeHeap heap(&hassManager, "Free Heap");
+HA::Sensor::Diag::AutoResetReason resetReason(&hassManager, "Reset Reason");
+```
 
-#### Constructors
-- `HASSManager()` - Default constructor
-- `HASSManager(String server, int port = 1883, String user = "", String pass = "")` - MQTT-only setup
-- `HASSManager(String ssid, String pass, String server, int port = 1883, String user = "", String pass = "", String devName = "", String mf = "", String devId = "", String mdl = "", String sw = "", String sn = "")` - Full setup
+## Examples
 
-#### WiFi Configuration
-- `void setWifiCredentials(String ssid, String pass)`
-- `void setWifiSSID(String ssid)`
-- `void setWifiPassword(String pass)`
+Comprehensive examples are provided for each device type and constructor variation.
 
-#### MQTT Configuration
-- `void setMqttServer(String server)`
-- `void setMqttPort(int port)`
-- `void setMqttCredentials(String user, String pass)`
-- `void setMqttUser(String user)`
-- `void setMqttPassword(String pass)`
+**PlatformIO:** Examples with `main.cpp` structure.
+- `Sensor_Generic_DefaultUnit` - Temperature sensor with predefined unit
+- `Sensor_Generic_Custom` - Custom sensor with arbitrary class and unit
+- `Sensor_Diag_Constructors` - Diagnostic sensor constructors
+- `Diagnostic_AutoSensors` - Auto-updated diagnostic sensors (RSSI, uptime, heap, reset reason)
+- `BinarySensor_Generic` - Door/window binary sensor example
+- `Button_Generic` - Button with callback
+- `Button_Restart` - Restart button
+- `Advanced_MultiEntity_With_Timers` - Multiple entities with timing logic
 
-#### Device Information
-- `void setDeviceInfo(String name, String manufacturer = "", String model = "", String swVersion = "", String serialNumber = "")`
-- `void setDeviceName(String name)`
-- `void setManufacturer(String mf)`
-- `void setModel(String mdl)`
-- `void setSwVersion(String sw)`
-- `void setSerialNumber(String sn)`
+**Arduino IDE:** Same examples as standalone `.ino` files.
 
-#### OTA (Over-The-Air) Updates
-- `void enableOTA(String password = "", String hostname = "")` - Enable OTA updates with optional password and hostname
-- `void disableOTA()` - Disable OTA updates
-- `void setOTAPassword(String password)` - Set OTA password for authentication
-- `void setOTAHostname(String hostname)` - Set OTA hostname (defaults to device name)
+All examples include detailed constructor comments and cover all available APIs.
 
-#### Logging
-- `void setLogLevel(int level)` - Set logging level (0=OFF, 1=FATAL, 2=ERROR, 3=WARNING, 4=INFO, 5=TRACE, 6=VERBOSE)
-- `void enableVerboseLogging()` - Enable verbose logging (level 6)
-- `void disableVerboseLogging()` - Disable verbose logging (level 4/INFO)
+## API Reference (Current)
 
-#### Remote Monitoring
-- `void enableRemoteLogging(String mqttTopic = "")` - Enable MQTT-based logging. Logs are published to the specified MQTT topic (default: `homeassistant/{deviceId}/logs`)
-- `void disableRemoteLogging()` - Disable MQTT logging and revert to serial-only output
-- `void enableTelnet(int port = 23)` - Enable telnet server for remote access to device console
-- `void disableTelnet()` - Disable telnet server
-- `void sendToTelnet(String message)` - Send message to connected telnet clients
-- `void sendToTelnet(const char* message)` - Send C-string message to connected telnet clients
+### Manager
 
-#### Connection Management
-- `bool begin()` - Initialize WiFi, MQTT, and OTA connections. Returns true on success, false if configuration is incomplete.
-- `void loop()` - Maintain connection, handle MQTT messages, and process OTA updates
+- `Manager(const char *ssid, const char *pass, const char *mqttServer, int logLevel = LOG_LEVEL_INFO)`
+- `void setMqttPort(uint16_t port)`
+- `void setMqttCredentials(const char *user, const char *pass)`
+- `void setAutoDiagInterval(unsigned long intervalMs)`
+- `bool begin(const char *deviceName, const char *manufacturer, const char *model, const char *swVersion)`
+- `void loop()`
 
-**Note:** `begin()` validates that WiFi SSID/password and MQTT server/port are configured before attempting connection. If any required settings are missing, it prints an error message and returns false.
+### Sensor
 
-### Device Classes
+- `Sensor::Generic(Manager *mgr, const char *name, SensorClass sensorClass, const char *stateClass = HA::MEASUREMENT)`
+- `Sensor::Generic(Manager *mgr, const char *name, const char *sensorClass, const char *unit, const char *stateClass = HA::MEASUREMENT)`
+- `void setValue(float value, int decimalPlaces = 1)`
+- `void setValue(int value)`
+- `void setValue(long value)`
+- `void setValue(double value, int decimalPlaces = 1)`
 
-#### Sensor
-- `Sensor(HASSManager* mgr, String name, String devClass = "", String unit = "")` - Basic constructor
-- `Sensor(HASSManager* mgr, String name, SensorClass sensorClass)` - Constructor with default unit
-- `void setValue(float value)` - Set sensor value
-- `void setUnit(String unit)` - Set unit of measurement
+### Binary Sensor
 
-#### Other Devices
+- `BinarySensor::Generic(Manager *mgr, const char *name, const char *sensorClass)`
+- `void setValue(bool state)`
 
-All devices inherit from `HASSDevice` and support:
-- `setState(...)` - Update device state
-- `setCommandCallback(std::function<void(HASSCommand)>)` - Handle commands from HA
+### Button
+
+- `Button::Generic(Manager *mgr, const char *name)`
+- `Button::Restart(Manager *mgr, const char *name)`
+- `void setCommandCallback(Callback cb)`
+
+## Notes
+
+- ESP32 only (guarded by `ARDUINO_ARCH_ESP32`).
+- Entity names are used in MQTT topics and unique IDs, and are combined with the device MAC.
+- Only the entity types listed above are implemented in this library.
+- AI assistance note: AI was used to generate documentation and examples and to answer occasional questions. It was not used for “vibe coding.” All library code is handwritten.
 
 ## License
 
 MIT License - see LICENSE file for details.
-
-## Contributing
-
-Contributions welcome! Please open issues and pull requests on GitHub.
