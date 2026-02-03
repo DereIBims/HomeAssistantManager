@@ -1,0 +1,36 @@
+{
+  "name": "HomeAssistantManager",
+  "version": "1.0.0",
+  "description": "A robust and feature-rich Home Assistant MQTT integration library for ESP32 microcontrollers. Provides seamless device auto-discovery, direct MQTT communication, and full support for multiple device types including sensors, lights, switches, binary sensors, and covers. Simplifies IoT device development with Home Assistant.",
+  "keywords": "home-assistant, mqtt, esp32, iot, smart-home, sensor, light, switch, binary-sensor, cover, auto-discovery, embedded, arduino, home-automation",
+  "authors": [
+    {
+      "name": "Philipp",
+      "url": "https://github.com/DereIBims"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DereIBims/HomeAssistantManager.git"
+  },
+  "license": "MIT",
+  "frameworks": "arduino",
+  "platforms": "espressif32",
+  "dependencies": [
+    {
+      "name": "knolleary/PubSubClient",
+      "version": "^2.8"
+    },
+    {
+      "name": "bblanchon/ArduinoJson",
+      "version": "^7.0"
+    },
+    {
+      "name": "thijse/ArduinoLog",
+      "version": "^1.0.1"
+    }
+  ],
+  "examples": [
+    
+  ]
+}
