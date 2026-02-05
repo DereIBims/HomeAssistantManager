@@ -1,11 +1,11 @@
 {
   "name": "HomeAssistantManager",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "A robust and feature-rich Home Assistant MQTT integration library for ESP32 microcontrollers. Provides seamless device auto-discovery, direct MQTT communication, and full support for multiple device types including sensors, lights, switches, binary sensors, and covers. Simplifies IoT device development with Home Assistant.",
   "keywords": "home-assistant, mqtt, esp32, iot, smart-home, sensor, light, switch, binary-sensor, cover, auto-discovery, embedded, arduino, home-automation",
   "authors": [
     {
-      "name": "Philipp",
+      "name": "DereIBims",
       "url": "https://github.com/DereIBims"
     }
   ],
@@ -16,6 +16,17 @@
   "license": "MIT",
   "frameworks": "arduino",
   "platforms": "espressif32",
+  "include": [
+    "src/*",
+    "src/Devices/*",
+    "examples/PlatformIO/*"
+  ],
+  "headers": [
+    "HomeAssistantManager.h",
+    "BinarySensor.h",
+    "Button.h",
+    "Sensor.h"
+  ],
   "dependencies": [
     {
       "name": "knolleary/PubSubClient",
@@ -30,38 +41,57 @@
       "version": "^1.0.1"
     }
   ],
+  "export": {
+    "exclude": [
+      "docs/*",
+      "test/*",
+      ".github/*",
+      ".vscode/*",
+      "platformio.ini",
+      "README.md",
+      "LICENSE"
+    ]
+  },
   "examples": [
     {
       "name": "Sensor_Generic_DefaultUnit",
-      "base": "examples/PlatformIO/Sensor_Generic_DefaultUnit"
+      "base": "examples/PlatformIO/Sensor_Generic_DefaultUnit",
+      "files": ["main.cpp", "README.md"]
     },
     {
       "name": "Sensor_Generic_Custom",
-      "base": "examples/PlatformIO/Sensor_Generic_Custom"
+      "base": "examples/PlatformIO/Sensor_Generic_Custom",
+      "files": ["main.cpp", "README.md"]
     },
     {
       "name": "Sensor_Diag_Constructors",
-      "base": "examples/PlatformIO/Sensor_Diag_Constructors"
+      "base": "examples/PlatformIO/Sensor_Diag_Constructors",
+      "files": ["main.cpp", "README.md"]
     },
     {
       "name": "Diagnostic_AutoSensors",
-      "base": "examples/PlatformIO/Diagnostic_AutoSensors"
+      "base": "examples/PlatformIO/Diagnostic_AutoSensors",
+      "files": ["main.cpp", "README.md"]
     },
     {
       "name": "BinarySensor_Generic",
-      "base": "examples/PlatformIO/BinarySensor_Generic"
+      "base": "examples/PlatformIO/BinarySensor_Generic",
+      "files": ["main.cpp", "README.md"]
     },
     {
       "name": "Button_Generic",
-      "base": "examples/PlatformIO/Button_Generic"
+      "base": "examples/PlatformIO/Button_Generic",
+      "files": ["main.cpp", "README.md"]
     },
     {
       "name": "Button_Restart",
-      "base": "examples/PlatformIO/Button_Restart"
+      "base": "examples/PlatformIO/Button_Restart",
+      "files": ["main.cpp", "README.md"]
     },
     {
       "name": "Advanced_MultiEntity_With_Timers",
-      "base": "examples/PlatformIO/Advanced_MultiEntity_With_Timers"
+      "base": "examples/PlatformIO/Advanced_MultiEntity_With_Timers",
+      "files": ["main.cpp", "README.md"]
     }
   ]
 }
