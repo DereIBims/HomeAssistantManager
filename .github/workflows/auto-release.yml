@@ -1,9 +1,6 @@
 name: Release (Arduino Library)
 
 on:
-  push:
-    branches:
-      - release
   pull_request:
     types:
       - closed
@@ -82,9 +79,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ZIP_NAME="repo-${{ steps.ver.outputs.tag }}.zip"
+          ZIP_NAME="HomeAssistantManager-${{ steps.ver.outputs.tag }}.zip"
           # zip vom gesamten Repo-Root, ohne .git
-          zip -r "${ZIP_NAME}" . -x ".git/*" -x ".github/workflows/*"
+          zip -r "${ZIP_NAME}" . -x ".git/*" -x ".github/workflows/*" -x ".github/*" -x ".github"
           echo "ZIP_NAME=${ZIP_NAME}" >> "$GITHUB_ENV"
 
       - name: Create GitHub Release + upload asset
