@@ -9,7 +9,7 @@ namespace HA {
     m_unit = unit;
     m_stateClass = stateClass;
     m_stateTopic = "homeassistant/sensor/" + String(name) + "_" + m_DeviceId + "/state";
-    m_type = DeviceType::SENSOR;
+    m_deviceType = "sensor";
   }
 
   void SensorBase::m_handleCallback(String payload) {} // No callback for sensors

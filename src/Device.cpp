@@ -56,7 +56,7 @@ namespace HA {
       manager->DeviceInfo["val_tpl"] = m_valueTemplate;
     }
 
-    String topic = "homeassistant/" + String(getDeviceType(m_type)) + "/" + manager->DeviceInfo["name"].as<String>() + "_" + m_DeviceId + "/config";
+    String topic = "homeassistant/" + m_deviceType + "/" + m_name + "_" + m_DeviceId + "/config";
     topic.replace(" ", "_");
     char config[512];
     serializeJson(manager->DeviceInfo, config);
@@ -65,6 +65,17 @@ namespace HA {
       Log.infoln("Registered device: %s on topic: %s", m_name, topic.c_str());
     } else {
       Log.errorln("Failed to register, ERROR: %d", manager->mqttClient.state());
+    }
+
+  }
+
+  void Device::unregisterEntity() {
+    String topic = "homeassistant/" + m_deviceType + "/" + m_name + "_" + m_DeviceId + "/config";
+    topic.replace(" ", "_");
+    if (manager->mqttClient.publish(topic.c_str(), nullptr, 0, true)) {
+      Log.infoln("Unregistered device: %s on topic: %s", m_name, topic.c_str());
+    } else {
+      Log.errorln("Failed to unregister, ERROR: %d", manager->mqttClient.state());
     }
   }
 
@@ -75,4 +86,4 @@ namespace HA {
     }
   }
 
-} // namespace HASSDevice
+} // namespace HA

@@ -3,14 +3,19 @@
 #if !defined(ARDUINO_ARCH_ESP32)
 #error "ESP32 only"
 #endif
-
-#include "Constants.h"
 #include <Arduino.h>
 #include <ArduinoJSON.h>
 #include <ArduinoLog.h>
 #include <PubSubClient.h>
 #include <WiFi.h>
 #include <vector>
+
+
+#include "Constants.h"
+#include "Devices/BinarySensor.h"
+#include "Devices/Button.h"
+#include "Devices/Sensor.h"
+#include "Devices/Switch.h"
 
 #define SERIAL_BAUD 115200
 
@@ -20,6 +25,7 @@ namespace HA {
     friend class Device;
     friend class BinarySensorBase;
     friend class SensorBase;
+    friend class SwitchBase;
 
 public:
     Manager(const char *WiFi_SSID, const char *WiFi_PASS, const char *MQTT_SERVER, int LOG_LEVEL = LOG_LEVEL_INFO);
@@ -28,7 +34,7 @@ public:
     void setMqttCredentials(const char *MQTT_USER, const char *MQTT_PASS);
     void setAutoDiagInterval(unsigned long interval);
 
-    bool begin(const char *DEVICE_NAME, const char *DEVICE_MANUFACTURER, const char *DEVICE_MODEL, const char *DEVICE_SW_VERSION);
+    bool begin(const char *DEVICE_NAME, const char *DEVICE_MANUFACTURER, const char *DEVICE_MODEL, const char *DEVICE_SW_VERSION, bool UnregisterDevices = false);
 
     void loop();
 
@@ -58,5 +64,6 @@ private:
     bool m_connect();
     void m_updateAutoDiag(bool SkipTimer = false);
     void m_mqttCallback(char *topic, byte *payload, unsigned int length);
+    void m_unregisterDevices();
   };
 }

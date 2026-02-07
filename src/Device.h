@@ -3,11 +3,6 @@
 
 namespace HA {
   class Manager;
-  enum struct DeviceType : uint8_t {
-    SENSOR,
-    BUTTON,
-    BINARY_SENSOR
-  };
   enum struct AutoDiagType : uint8_t {
     NONE,
     HEAP,
@@ -16,26 +11,14 @@ namespace HA {
     UPTIME
   };
 
-  constexpr const char *getDeviceType(DeviceType type) {
-    switch (type) {
-    case DeviceType::SENSOR:
-      return "sensor";
-    case DeviceType::BUTTON:
-      return "button";
-    case DeviceType::BINARY_SENSOR:
-      return "binary_sensor";
-    default:
-      return "Unknown";
-    }
-  };
-
   class Device {
     friend class Manager;
+    friend class StateMixin;
 
 protected:
     Manager *manager;
-    DeviceType m_type;
     AutoDiagType m_diagType = AutoDiagType::NONE;
+    String m_deviceType;
     String m_commandTopic = "";
     String m_stateTopic = "";
     inline static String m_DeviceId = String(ESP.getEfuseMac(), HEX);
@@ -52,6 +35,7 @@ protected:
 private:
     void registerEntity();
     void subscribeEntity();
+    void unregisterEntity();
 
 public:
     Device(Manager *mgr);
@@ -59,6 +43,8 @@ public:
     void setState(String &STATE);
   };
 
+
+  
   template <typename... Args>
   class CallbackMixin {
     friend class Manager;
@@ -68,7 +54,8 @@ public:
     void setCommandCallback(Callback cb) { m_callback = std::move(cb); }
 
 protected:
-    void RunCallback(Args... args) {
+    void RunCallback(Args... args)
+    {
       if (m_callback)
         m_callback(std::forward<Args>(args)...);
     }

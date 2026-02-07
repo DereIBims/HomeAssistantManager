@@ -6,7 +6,8 @@ namespace HA {
   unsigned long LastAutoDiagUpdate = 0;
 
   Manager::Manager(const char *WiFi_SSID, const char *WiFi_PASS, const char *MQTT_SERVER, int LOG_LEVEL)
-      : m_wifiSsid(WiFi_SSID), m_wifiPass(WiFi_PASS), m_mqttServer(MQTT_SERVER), mqttClient(m_wifiClient), m_loglevel(LOG_LEVEL) {
+      : m_wifiSsid(WiFi_SSID), m_wifiPass(WiFi_PASS), m_mqttServer(MQTT_SERVER), mqttClient(m_wifiClient), m_loglevel(LOG_LEVEL)
+  {
     mqttClient.setBufferSize(1024);
     mqttClient.setCallback([this](char *t, byte *p, unsigned int l) { m_mqttCallback(t, p, l); });
     String DeviceId = String(ESP.getEfuseMac(), HEX);
@@ -14,21 +15,25 @@ namespace HA {
     availTopic = DeviceId + "/available";
   }
 
-  void Manager::setMqttPort(uint16_t port) {
+  void Manager::setMqttPort(uint16_t port)
+  {
     m_mqttPort = port;
     mqttClient.setServer(m_mqttServer, m_mqttPort);
   }
 
-  void Manager::setMqttCredentials(const char *user, const char *pass) {
+  void Manager::setMqttCredentials(const char *user, const char *pass)
+  {
     m_mqttUser = user;
     m_mqttPass = pass;
   }
 
-  void Manager::setAutoDiagInterval(unsigned long interval) {
+  void Manager::setAutoDiagInterval(unsigned long interval)
+  {
     m_AutoDiagInterval = interval;
   }
 
-  bool Manager::begin(const char *name, const char *mf, const char *mdl, const char *sw) {
+  bool Manager::begin(const char *name, const char *manufacturer, const char *model, const char *software_version, bool unregisterDevices)
+  {
 
     Log.begin(m_loglevel, &Serial);
 
@@ -49,15 +54,15 @@ namespace HA {
       Log.errorln("Device name not set. Call setDeviceInfo().");
       return false;
     }
-    if (!mf || !*mf) {
+    if (!manufacturer || !*manufacturer) {
       Log.errorln("Manufacturer not set. Call setDeviceInfo().");
       return false;
     }
-    if (!mdl || !*mdl) {
+    if (!model || !*model) {
       Log.errorln("Model not set. Call setDeviceInfo().");
       return false;
     }
-    if (!sw || !*sw) {
+    if (!software_version || !*software_version) {
       Log.errorln("Software version not set. Call setDeviceInfo().");
       return false;
     }
@@ -66,22 +71,30 @@ namespace HA {
     }
 
     ManagerInfo["name"] = name;
-    ManagerInfo["manufacturer"] = mf;
-    ManagerInfo["model"] = mdl;
-    ManagerInfo["sw_version"] = sw;
+    ManagerInfo["manufacturer"] = manufacturer;
+    ManagerInfo["model"] = model;
+    ManagerInfo["sw_version"] = software_version;
 
     mqttClient.setServer(m_mqttServer, m_mqttPort);
 
     if (m_connect()) {
-      m_subsribeTopics();
-      m_registerDevices();
-      m_updateAutoDiag(true);
+      if (!unregisterDevices) {
+        m_subsribeTopics();
+        m_registerDevices();
+        m_updateAutoDiag(true);
+      }
+      else {
+        m_unregisterDevices();
+      }
       return true;
     }
-    return false;
+    else {
+      return false;
+    }
   }
 
-  bool Manager::m_connect() {
+  bool Manager::m_connect()
+  {
     unsigned long startTime = millis();
     Log.info("Connecting to WiFi %s...", m_wifiSsid);
     WiFi.begin(m_wifiSsid, m_wifiPass);
@@ -91,7 +104,6 @@ namespace HA {
         Log.errorln("WiFi connection timeout.");
         return false;
       }
-      Serial.print(".");
       delay(500);
     }
     Log.infoln("");
@@ -107,7 +119,8 @@ namespace HA {
       if (mqttClient.connect(String(ESP.getEfuseMac(), HEX).c_str(), m_mqttUser, m_mqttPass, availTopic.c_str(), 1, true, "offline")) {
         Log.infoln("MQTT connected successfully");
         // subscribe to all command topics
-      } else {
+      }
+      else {
         delay(5000);
       }
     }
@@ -117,7 +130,8 @@ namespace HA {
     return true;
   }
 
-  void Manager::loop() {
+  void Manager::loop()
+  {
     if (!mqttClient.connected()) {
       m_connect(); // Attempt to reconnect
     }
@@ -125,23 +139,41 @@ namespace HA {
     m_updateAutoDiag();
   }
 
-  void Manager::addDevice(Device *device) {
+  void Manager::m_unregisterDevices()
+  {
+    for (auto d : m_devices) {
+      d->unregisterEntity();
+    }
+    Serial.println("Cleared retained MQTT configs for all devices.");
+    Serial.println("Remove function call and restart the device to re-register entities with Home Assistant.");
+    Serial.println("Restart the device to re-register entities with Home Assistant.");
+    Serial.println("Device will now halt since entities are unregistered. Restart to re-register.");
+    while (true) {
+      yield();
+    }
+  }
+
+  void Manager::addDevice(Device *device)
+  {
     m_devices.push_back(device);
   }
 
-  void Manager::m_registerDevices() {
+  void Manager::m_registerDevices()
+  {
     for (auto d : m_devices) {
       d->registerEntity();
     }
   }
 
-  void Manager::m_subsribeTopics() {
+  void Manager::m_subsribeTopics()
+  {
     for (auto d : m_devices) {
       d->subscribeEntity();
     }
   }
 
-  void Manager::m_mqttCallback(char *topic, byte *payload, unsigned int length) {
+  void Manager::m_mqttCallback(char *topic, byte *payload, unsigned int length)
+  {
     String t = topic;
     String p;
     for (unsigned int i = 0; i < length; i++) {
@@ -155,19 +187,23 @@ namespace HA {
     }
   }
 
-  void Manager::m_updateAutoDiag(bool SkipTimer) {
+  void Manager::m_updateAutoDiag(bool SkipTimer)
+  {
     if (millis() - LastAutoDiagUpdate > m_AutoDiagInterval || SkipTimer) {
       for (auto d : m_devices) {
         if (d->m_diagType == AutoDiagType::RSSI) {
           String RSSI = String(WiFi.RSSI());
           d->setState(RSSI);
-        } else if (d->m_diagType == AutoDiagType::UPTIME) {
+        }
+        else if (d->m_diagType == AutoDiagType::UPTIME) {
           String uptimeValue = String(millis() / 1000);
           d->setState(uptimeValue);
-        } else if (d->m_diagType == AutoDiagType::HEAP) {
+        }
+        else if (d->m_diagType == AutoDiagType::HEAP) {
           String freeHeapValue = String(ESP.getFreeHeap());
           d->setState(freeHeapValue);
-        } else if (d->m_diagType == AutoDiagType::RESET) {
+        }
+        else if (d->m_diagType == AutoDiagType::RESET) {
           esp_reset_reason_t r = esp_reset_reason();
           String reason = GetRestartString(r);
           d->setState(reason);
@@ -177,7 +213,8 @@ namespace HA {
     }
   }
 
-  const String Manager::GetRestartString(esp_reset_reason_t reason) {
+  const String Manager::GetRestartString(esp_reset_reason_t reason)
+  {
     switch (reason) {
     case ESP_RST_UNKNOWN:
       return "Unknown";
@@ -201,16 +238,6 @@ namespace HA {
       return "Brownout reset";
     case ESP_RST_SDIO:
       return "SDIO reset";
-    case ESP_RST_USB:
-      return "USB reset";
-    case ESP_RST_JTAG:
-      return "JTAG reset";
-    case ESP_RST_EFUSE:
-      return "Efuse reset";
-    case ESP_RST_PWR_GLITCH:
-      return "Power glitch detected";
-    case ESP_RST_CPU_LOCKUP:
-      return "CPU lock up";
     default:
       return "Unknown";
     }

@@ -1,4 +1,3 @@
-#include <Devices/Sensor.h>
 #include <HomeAssistantManager.h>
 
 // Manager constructor: (ssid, password, mqttHost, logLevel)

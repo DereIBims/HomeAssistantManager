@@ -1,6 +1,3 @@
-#include <Devices/Button.h>
-#include <Devices/BinarySensor.h>
-#include <Devices/Sensor.h>
 #include <HomeAssistantManager.h>
 
 // Manager constructor: (ssid, password, mqttHost, logLevel)

@@ -1,6 +1,5 @@
 #pragma once
 #include "../Device.h"
-#include <ArduinoJson.h>
 
 namespace HA {
   class Manager;
@@ -8,22 +7,26 @@ namespace HA {
     friend class Manager;
 
 public:
-    ButtonBase(Manager *mgr, const char *name);
+    ButtonBase(Manager *mgr, const char *name, bool DIAGNOSTIC = false);
 
 private:
     void m_handleCallback(String payload) override;
+public:
+    void setState(const char *STATE) = delete;
+    void setState(String &STATE) = delete;
   };
 
   class Button {
 public:
     class Generic : public ButtonBase {
   public:
-      Generic(Manager *mgr, const char *name);
+      Generic(Manager *mgr, const char *name, bool DIAGNOSTIC = false);
     };
 
     class Restart : public ButtonBase {
   public:
-      Restart(Manager *mgr, const char *name);
+      Restart(Manager *mgr, const char *name, bool DIAGNOSTIC = false);
+  protected:
       static void RestartCallback();
     };
   };

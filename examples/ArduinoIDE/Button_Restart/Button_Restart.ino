@@ -1,4 +1,3 @@
-#include <Devices/Button.h>
 #include <HomeAssistantManager.h>
 
 // Manager constructor: (ssid, password, mqttHost)
