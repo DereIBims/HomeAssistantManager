@@ -1,6 +1,6 @@
 {
   "name": "HomeAssistantManager",
-  "version": "1.0.2",
+  "version": "1.1.1",
   "description": "A robust and feature-rich Home Assistant MQTT integration library for ESP32 microcontrollers. Provides seamless device auto-discovery, direct MQTT communication, and full support for multiple device types including sensors, lights, switches, binary sensors, and covers. Simplifies IoT device development with Home Assistant.",
   "keywords": "home-assistant, mqtt, esp32, iot, smart-home, sensor, light, switch, binary-sensor, cover, auto-discovery, embedded, arduino, home-automation",
   "authors": [
@@ -22,10 +22,7 @@
     "examples/PlatformIO/*"
   ],
   "headers": [
-    "HomeAssistantManager.h",
-    "BinarySensor.h",
-    "Button.h",
-    "Sensor.h"
+    "HomeAssistantManager.h"
   ],
   "dependencies": [
     {

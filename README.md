@@ -34,9 +34,6 @@ lib_deps =
 ## Quick Start
 
 ```cpp
-#include "Devices/Button.h"
-#include "Devices/BinarySensor.h"
-#include "Devices/Sensor.h"
 #include "HomeAssistantManager.h"
 
 // Manager requires WiFi + MQTT server, log level is optional

@@ -3,14 +3,19 @@
 #if !defined(ARDUINO_ARCH_ESP32)
 #error "ESP32 only"
 #endif
-
-#include "Constants.h"
 #include <Arduino.h>
 #include <ArduinoJSON.h>
 #include <ArduinoLog.h>
 #include <PubSubClient.h>
 #include <WiFi.h>
 #include <vector>
+
+
+#include "Constants.h"
+#include "Devices/BinarySensor.h"
+#include "Devices/Button.h"
+#include "Devices/Sensor.h"
+#include "Devices/Switch.h"
 
 #define SERIAL_BAUD 115200
 
