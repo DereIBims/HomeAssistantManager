@@ -15,6 +15,7 @@ Home Assistant MQTT auto-discovery library for ESP32. It provides a small set of
 - **Sensor**: `HA::Sensor::Generic`, `HA::Sensor::Diag`, plus auto-diagnostic sensor variants.
 - **Binary Sensor**: `HA::BinarySensor::Generic`.
 - **Button**: `HA::Button::Generic`, `HA::Button::Restart`.
+- **Switch**: `HA::Switch::Generic`, `HA::Switch::Outlet`.
 
 ## Dependencies
 
@@ -24,12 +25,17 @@ Home Assistant MQTT auto-discovery library for ESP32. It provides a small set of
 
 ## Installation (PlatformIO)
 
-Add to your [platformio.ini](platformio.ini):
+Add to your `platformio.ini`:
 
 ```ini
 lib_deps =
         https://github.com/DereIBims/HomeAssistantManager.git
+        knolleary/PubSubClient@^2.8
+        bblanchon/ArduinoJson@^7.0
+        thijse/ArduinoLog@^1.0.1
 ```
+
+**Note:** All dependencies are automatically handled by the library definition, however for some reason they're not available for the project. Therefor they need to be added to `lib_deps`.
 
 ## Quick Start
 
@@ -95,6 +101,9 @@ Comprehensive examples are provided for each device type and constructor variati
 - `BinarySensor_Generic` - Door/window binary sensor example
 - `Button_Generic` - Button with callback
 - `Button_Restart` - Restart button
+- `Switch_Generic` - Generic switch with bidirectional control
+- `Switch_Outlet` - Outlet-class switch for power outlets and appliances
+- `Device_Removal` - Demonstrates how to cleanly remove a device from Home Assistant
 - `Advanced_MultiEntity_With_Timers` - Multiple entities with timing logic
 
 **Arduino IDE:** Same examples as standalone `.ino` files.
@@ -109,7 +118,12 @@ All examples include detailed constructor comments and cover all available APIs.
 - `void setMqttPort(uint16_t port)`
 - `void setMqttCredentials(const char *user, const char *pass)`
 - `void setAutoDiagInterval(unsigned long intervalMs)`
-- `bool begin(const char *deviceName, const char *manufacturer, const char *model, const char *swVersion)`
+- `bool begin(const char *deviceName, const char *manufacturer, const char *model, const char *swVersion, bool unregisterDevices = false)`
+  - **unregisterDevices parameter:**
+    - `false` (default): Normal operation - device registers and stays registered
+    - `true`: ⚠️ **Removes ONLY entities defined in current code, program halts after removal, must set to `false` to reactivate**
+    - **Important**: Old/renamed entities not in current code are NOT removed (delete manually from Home Assistant or the MQTT Broker with something like MQTT Explorer)
+    - See `Device_Removal` example for complete workflow
 - `void loop()`
 
 ### Sensor
@@ -132,12 +146,23 @@ All examples include detailed constructor comments and cover all available APIs.
 - `Button::Restart(Manager *mgr, const char *name)`
 - `void setCommandCallback(Callback cb)`
 
+### Switch
+
+- `Switch::Generic(Manager *mgr, const char *name)`
+- `Switch::Outlet(Manager *mgr, const char *name)`
+- `void setCommandCallback(Callback cb)`
+- `void setValue(bool state)`
+
 ## Notes
 
 - ESP32 only (guarded by `ARDUINO_ARCH_ESP32`).
 - Entity names are used in MQTT topics and unique IDs, and are combined with the device MAC.
-- Only the entity types listed above are implemented in this library.
-- AI assistance note: AI was used to generate documentation and examples and to answer occasional questions. It was not used for “vibe coding.” All library code is handwritten.
+- Only the entity types listed above are implemented in this library.- **Device Removal**: When `unregisterDevices = true` in `Manager::begin()`:
+  - ⚠️ Only removes entities **currently defined in your code**
+  - ⚠️ Program **halts after removal** (intentional - no entities to process)
+  - ⚠️ **Must set back to `false` and reflash to use device again**
+  - Old/renamed entities must be manually deleted from Home Assistant
+  - See `Device_Removal` example for complete workflow- AI assistance note: AI was used to generate documentation and examples and to answer occasional questions. It was not used for “vibe coding.” All library code is handwritten.
 
 ## License
 
