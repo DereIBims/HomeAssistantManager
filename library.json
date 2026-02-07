@@ -93,5 +93,9 @@
       "base": "examples/PlatformIO/Advanced_MultiEntity_With_Timers",
       "files": ["main.cpp", "README.md"]
     }
-  ]
+  ],
+  "build": {
+    "unflags": "-std=gnu++11",
+    "flags": "-std=gnu++17"
+  }
 }
