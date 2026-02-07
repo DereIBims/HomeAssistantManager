@@ -86,6 +86,21 @@
       "files": ["main.cpp", "README.md"]
     },
     {
+      "name": "Switch_Generic",
+      "base": "examples/PlatformIO/Switch_Generic",
+      "files": ["main.cpp", "README.md"]
+    },
+    {
+      "name": "Switch_Outlet",
+      "base": "examples/PlatformIO/Switch_Outlet",
+      "files": ["main.cpp", "README.md"]
+    },
+    {
+      "name": "Device_Removal",
+      "base": "examples/PlatformIO/Device_Removal",
+      "files": ["main.cpp", "README.md"]
+    },
+    {
       "name": "Advanced_MultiEntity_With_Timers",
       "base": "examples/PlatformIO/Advanced_MultiEntity_With_Timers",
       "files": ["main.cpp", "README.md"]
