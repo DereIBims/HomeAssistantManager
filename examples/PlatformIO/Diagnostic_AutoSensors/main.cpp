@@ -22,5 +22,6 @@ void setup() {
 
 void loop() {
   Manager.loop();
-  delay(100);
+  // Auto-diagnostic sensors update automatically in Manager.loop()
+  // No additional delay needed
 }

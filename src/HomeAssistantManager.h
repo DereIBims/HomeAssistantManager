@@ -4,7 +4,7 @@
 #error "ESP32 only"
 #endif
 #include <Arduino.h>
-#include <ArduinoJSON.h>
+#include <ArduinoJson.h>
 #include <ArduinoLog.h>
 #include <PubSubClient.h>
 #include <WiFi.h>

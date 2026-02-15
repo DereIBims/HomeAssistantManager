@@ -17,6 +17,10 @@ void setup() {
 
 void loop() {
   Manager.loop();
-  temperature.setValue(23.7, 1);
-  delay(5000);
+  
+  static unsigned long lastUpdate = 0;
+  if (millis() - lastUpdate > 5000) {
+    temperature.setValue(23.7, 1);
+    lastUpdate = millis();
+  }
 }
