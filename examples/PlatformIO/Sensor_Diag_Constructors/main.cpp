@@ -20,7 +20,11 @@ void setup() {
 
 void loop() {
   Manager.loop();
-  diagBattery.setValue(88);
-  diagText.setState("OK");
-  delay(5000);
+  
+  static unsigned long lastUpdate = 0;
+  if (millis() - lastUpdate > 5000) {
+    diagBattery.setValue(88);
+    diagText.setState("OK");
+    lastUpdate = millis();
+  }
 }

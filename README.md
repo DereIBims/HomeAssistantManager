@@ -29,13 +29,27 @@ Add to your `platformio.ini`:
 
 ```ini
 lib_deps =
-        https://github.com/DereIBims/HomeAssistantManager.git
+        dereibims/HomeAssistantManager@^1.1.3
         knolleary/PubSubClient@^2.8
         bblanchon/ArduinoJson@^7.0
         thijse/ArduinoLog@^1.0.1
 ```
 
 **Note:** All dependencies are automatically handled by the library definition, however for some reason they're not available for the project. Therefor they need to be added to `lib_deps`.
+
+## Installation (Arduino IDE)
+
+1. Download the source code from the [latest release on GitHub](https://github.com/DereIBims/HomeAssistantManager/releases)
+2. In Arduino IDE, go to **Sketch** → **Include Library** → **Add .ZIP Library**
+3. Select the downloaded `.zip` file
+
+**⚠️ Important:** You must manually install all dependencies - they will NOT be installed automatically:
+
+- [PubSubClient by Nick O'Leary](https://www.arduino.cc/reference/en/libraries/pubsubclient/)
+- [ArduinoJson by Benoit Blanchon](https://www.arduino.cc/reference/en/libraries/arduinojson/)
+- [ArduinoLog by Thijs Elenbaas](https://www.arduino.cc/reference/en/libraries/arduinolog/)
+
+Install each dependency through **Sketch** → **Include Library** → **Manage Libraries**, then search and install each one.
 
 ## Quick Start
 

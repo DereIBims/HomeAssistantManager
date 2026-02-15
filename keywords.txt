@@ -1,0 +1,105 @@
+# Datatypes (KEYWORD1)
+HA	KEYWORD1		
+Manager	KEYWORD1		
+Device	KEYWORD1		
+SensorClass	KEYWORD1		
+AutoDiagType	KEYWORD1		
+CallbackMixin	KEYWORD1		
+
+SwitchBase	KEYWORD1		
+Switch	KEYWORD1		
+SensorBase	KEYWORD1		
+Sensor	KEYWORD1		
+ButtonBase	KEYWORD1		
+Button	KEYWORD1		
+BinarySensorBase	KEYWORD1		
+BinarySensor	KEYWORD1		
+
+Generic	KEYWORD1		
+Outlet	KEYWORD1		
+Diag	KEYWORD1		
+AutoRSSI	KEYWORD1		
+AutoUptime	KEYWORD1		
+AutoFreeHeap	KEYWORD1		
+AutoResetReason	KEYWORD1		
+Restart	KEYWORD1		
+
+# Methods and Functions (KEYWORD2)
+setMqttPort	KEYWORD2		
+setMqttCredentials	KEYWORD2		
+setAutoDiagInterval	KEYWORD2		
+begin	KEYWORD2		
+loop	KEYWORD2		
+setValue	KEYWORD2		
+setState	KEYWORD2		
+setCommandCallback	KEYWORD2		
+RunCallback	KEYWORD2		
+RestartCallback	KEYWORD2		
+
+# Constants (LITERAL1)
+ON	LITERAL1		
+OFF	LITERAL1		
+on	LITERAL1		
+off	LITERAL1		
+closed	LITERAL1		
+opened	LITERAL1		
+
+Battery	LITERAL1		
+Humidity	LITERAL1		
+Illuminance	LITERAL1		
+SignalStrength	LITERAL1		
+Temperature	LITERAL1		
+Pressure	LITERAL1		
+Power	LITERAL1		
+Current	LITERAL1		
+Energy	LITERAL1		
+PowerFactor	LITERAL1		
+Voltage	LITERAL1		
+Frequency	LITERAL1		
+Speed	LITERAL1		
+Volume	LITERAL1		
+VolumeFlow	LITERAL1		
+CO2	LITERAL1		
+CO	LITERAL1		
+PM1	LITERAL1		
+PM25	LITERAL1		
+PM10	LITERAL1		
+VOC	LITERAL1		
+NOx	LITERAL1		
+NOxIndex	LITERAL1		
+SulphurDioxide	LITERAL1		
+Ozone	LITERAL1		
+Radiation	LITERAL1		
+
+MEASUREMENT	LITERAL1		
+TOTAL	LITERAL1		
+TOTAL_INCREASING	LITERAL1		
+ANGLE	LITERAL1		
+
+BatteryLow	LITERAL1		
+BatteryCharging	LITERAL1		
+CarbonMonoxide	LITERAL1		
+Cold	LITERAL1		
+Connectivity	LITERAL1		
+Door	LITERAL1		
+GarageDoor	LITERAL1		
+Gas	LITERAL1		
+Heat	LITERAL1		
+LightBinary	LITERAL1		
+Lock	LITERAL1		
+Moisture	LITERAL1		
+Motion	LITERAL1		
+Moving	LITERAL1		
+Occupancy	LITERAL1		
+Opening	LITERAL1		
+Plug	LITERAL1		
+Presence	LITERAL1		
+Problem	LITERAL1		
+Running	LITERAL1		
+Safety	LITERAL1		
+Smoke	LITERAL1		
+Sound	LITERAL1		
+Tamper	LITERAL1		
+Update	LITERAL1		
+Vibration	LITERAL1		
+Window	LITERAL1		

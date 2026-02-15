@@ -17,6 +17,10 @@ void setup() {
 
 void loop() {
   Manager.loop();
-  windSpeed.setValue(6.42, 2);
-  delay(5000);
+  
+  static unsigned long lastUpdate = 0;
+  if (millis() - lastUpdate > 5000) {
+    windSpeed.setValue(6.42, 2);
+    lastUpdate = millis();
+  }
 }
