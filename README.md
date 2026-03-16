@@ -29,7 +29,7 @@ Add to your `platformio.ini`:
 
 ```ini
 lib_deps =
-        dereibims/HomeAssistantManager@^1.1.3
+        dereibims/HomeAssistantManager@^1.1.4
         knolleary/PubSubClient@^2.8
         bblanchon/ArduinoJson@^7.0
         thijse/ArduinoLog@^1.0.1

@@ -97,6 +97,22 @@ namespace HA {
   {
     unsigned long startTime = millis();
     Log.info("Connecting to WiFi %s...", m_wifiSsid);
+    String hostname = ManagerInfo["model"].as<String>();
+    for (size_t i = 0; i < hostname.length(); i++) {
+      char c = hostname[i];
+      if (!
+          (
+          (c >= 'a' && c <= 'z') ||
+          (c >= 'A' && c <= 'Z') ||
+          (c >= '0' && c <= '9') ||
+          (c == '-')
+          )
+        ) {
+          hostname[i] = '-';
+      }
+    }
+    hostname += "_" + String(ESP.getEfuseMac(), HEX);
+    WiFi.setHostname(hostname.c_str());
     WiFi.begin(m_wifiSsid, m_wifiPass);
     while (WiFi.status() != WL_CONNECTED) {
       if (millis() - startTime > 30000) { // 30 second timeout
