@@ -6,8 +6,8 @@ namespace HA {
   {
     m_name = name;
     m_deviceClass = sensorClass;
-    m_stateTopic = "homeassistant/binary_sensor/" + String(name) + "_" + m_DeviceId + "/state";
     m_deviceType = "binary_sensor";
+    m_stateTopic = getTopicBase() + "/state";
   }
 
   void BinarySensorBase::m_handleCallback(String payload) {} // No callback for binary sensors

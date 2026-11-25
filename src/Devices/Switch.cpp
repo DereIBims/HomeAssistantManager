@@ -6,13 +6,13 @@ namespace HA {
   {
     m_name = name;
     m_deviceType = "switch";
-    m_commandTopic = "homeassistant/switch/" + String(name) + "_" + m_DeviceId + "/command";
-    m_stateTopic = "homeassistant/switch/" + String(name) + "_" + m_DeviceId + "/state";
+    m_commandTopic = getTopicBase() + "/command";
+    m_stateTopic = getTopicBase() + "/state";
   }
 
   void SwitchBase::m_handleCallback(String payload)
   {
-    Log.infoln("Switch command received for: %s, Payload: %s", m_name, payload);
+    Log.infoln("Switch command received for: %s, Payload: %s", m_name, payload.c_str());
     if (payload.equalsIgnoreCase("ON")) {
       setValue(true);
       RunCallback(true);
@@ -22,7 +22,7 @@ namespace HA {
       RunCallback(false);
     }
     else {
-      Log.errorln("Invalid payload for switch: %s. Expected 'ON' or 'OFF'. Received: %s", m_name, payload);
+      Log.errorln("Invalid payload for switch: %s. Expected 'ON' or 'OFF'. Received: %s", m_name, payload.c_str());
     }
   }
 

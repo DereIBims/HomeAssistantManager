@@ -1,8 +1,8 @@
 {
   "name": "HomeAssistantManager",
-  "version": "1.1.4",
-  "description": "A robust and feature-rich Home Assistant MQTT integration library for ESP32 microcontrollers. Provides seamless device auto-discovery, direct MQTT communication, and full support for multiple device types including sensors, lights, switches, binary sensors, and covers. Simplifies IoT device development with Home Assistant.",
-  "keywords": "home-assistant, mqtt, esp32, iot, smart-home, sensor, light, switch, binary-sensor, cover, auto-discovery, embedded, arduino, home-automation",
+  "version": "1.2.0",
+  "description": "Home Assistant MQTT auto-discovery library for ESP32. It supports sensors, binary sensors, buttons, switches, numbers, selects, and events, with simple APIs and diagnostic helpers.",
+  "keywords": "home-assistant, mqtt, esp32, iot, smart-home, sensor, switch, binary-sensor, button, number, select, event, auto-discovery, embedded, arduino, home-automation",
   "authors": [
     {
       "name": "DereIBims",
@@ -93,6 +93,21 @@
     {
       "name": "Switch_Outlet",
       "base": "examples/PlatformIO/Switch_Outlet",
+      "files": ["main.cpp", "README.md"]
+    },
+    {
+      "name": "Number_Generic",
+      "base": "examples/PlatformIO/Number_Generic",
+      "files": ["main.cpp", "README.md"]
+    },
+    {
+      "name": "Select_Generic",
+      "base": "examples/PlatformIO/Select_Generic",
+      "files": ["main.cpp", "README.md"]
+    },
+    {
+      "name": "Event_Generic",
+      "base": "examples/PlatformIO/Event_Generic",
       "files": ["main.cpp", "README.md"]
     },
     {

@@ -1,9 +1,9 @@
 #include <HomeAssistantManager.h>
 
-// Manager constructor: (ssid, password, mqttHost)
+// Manager constructor: (Wi-Fi SSID, Wi-Fi password, MQTT broker hostname or IP, log level = LOG_LEVEL_INFO)
 HA::Manager Manager("your-ssid", "your-password", "mqtt-host");
 
-// Switch::Generic constructor: (manager, name)
+// Switch::Generic constructor: (manager, entity display name)
 HA::Switch::Generic mainSwitch(&Manager, "Main Switch");
 
 void onSwitchCommand(bool state) {
@@ -16,8 +16,10 @@ void onSwitchCommand(bool state) {
 
 void setup() {
   Serial.begin(115200);
+  // setCommandCallback(function receiving the requested on/off state as a bool)
   mainSwitch.setCommandCallback(onSwitchCommand);
 
+  // Manager.begin(device name, manufacturer, model, firmware version, unregister entities = false)
   if (!Manager.begin("ESP32_Switch", "MyCompany", "ESP32", "1.0.0")) {
     while (true) {
       delay(1000);
@@ -32,6 +34,7 @@ void loop() {
   static unsigned long lastToggle = 0;
   if (millis() - lastToggle > 10000) {
     static bool state = false;
+    // setValue(switch state, true = on and false = off)
     mainSwitch.setValue(state);
     state = !state;
     lastToggle = millis();

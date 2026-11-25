@@ -8,6 +8,14 @@ CallbackMixin	KEYWORD1
 
 SwitchBase	KEYWORD1		
 Switch	KEYWORD1		
+NumberBase	KEYWORD1
+Number	KEYWORD1
+SelectBase	KEYWORD1
+Select	KEYWORD1
+EventBase	KEYWORD1
+Event	KEYWORD1
+setEntityId	KEYWORD2
+trigger	KEYWORD2
 SensorBase	KEYWORD1		
 Sensor	KEYWORD1		
 ButtonBase	KEYWORD1		
@@ -67,6 +75,7 @@ PM10	LITERAL1
 VOC	LITERAL1		
 NOx	LITERAL1		
 NOxIndex	LITERAL1		
+NitrogenMonoxide	LITERAL1
 SulphurDioxide	LITERAL1		
 Ozone	LITERAL1		
 Radiation	LITERAL1		

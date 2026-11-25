@@ -8,8 +8,12 @@ namespace HA {
     m_deviceClass = sensorClass;
     m_unit = unit;
     m_stateClass = stateClass;
-    m_stateTopic = "homeassistant/sensor/" + String(name) + "_" + m_DeviceId + "/state";
+    if (stateClass && strcmp(stateClass, HA::MEASUREMENT) == 0 && sensorClass &&
+        (strcmp(sensorClass, "energy") == 0 || strcmp(sensorClass, "volume") == 0)) {
+      m_stateClass = HA::TOTAL;
+    }
     m_deviceType = "sensor";
+    m_stateTopic = getTopicBase() + "/state";
   }
 
   void SensorBase::m_handleCallback(String payload) {} // No callback for sensors

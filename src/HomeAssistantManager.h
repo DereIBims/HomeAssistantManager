@@ -14,6 +14,9 @@
 #include "Constants.h"
 #include "Devices/BinarySensor.h"
 #include "Devices/Button.h"
+#include "Devices/Event.h"
+#include "Devices/Number.h"
+#include "Devices/Select.h"
 #include "Devices/Sensor.h"
 #include "Devices/Switch.h"
 
@@ -29,6 +32,9 @@ namespace HA {
 
 public:
     Manager(const char *WiFi_SSID, const char *WiFi_PASS, const char *MQTT_SERVER, int LOG_LEVEL = LOG_LEVEL_INFO);
+    ~Manager();
+    Manager(const Manager &) = delete;
+    Manager &operator=(const Manager &) = delete;
 
     void setMqttPort(uint16_t MQTT_PORT);
     void setMqttCredentials(const char *MQTT_USER, const char *MQTT_PASS);
@@ -48,6 +54,8 @@ private:
     const char *m_mqttPass = nullptr;
     int m_loglevel;
     unsigned long m_AutoDiagInterval = 30000;
+    unsigned long m_lastMqttAttempt = 0;
+    bool m_started = false;
     uint16_t m_mqttPort = 1883;
     String availTopic;
 
@@ -61,7 +69,10 @@ private:
     void m_registerDevices();
     void m_subsribeTopics();
     void addDevice(Device *device);
+    void removeDevice(Device *device);
     bool m_connect();
+    bool m_connectMqtt();
+    void m_restoreDevices();
     void m_updateAutoDiag(bool SkipTimer = false);
     void m_mqttCallback(char *topic, byte *payload, unsigned int length);
     void m_unregisterDevices();

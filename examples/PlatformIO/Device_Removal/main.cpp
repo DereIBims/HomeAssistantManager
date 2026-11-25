@@ -1,9 +1,10 @@
 #include <HomeAssistantManager.h>
 
-// Manager constructor: (ssid, password, mqttHost, logLevel)
+// Manager constructor: (Wi-Fi SSID, Wi-Fi password, MQTT broker hostname or IP, log level = LOG_LEVEL_INFO)
 HA::Manager Manager("your-ssid", "your-password", "mqtt-host");
 
 // Create some example entities
+// Button::Generic constructor: (manager, entity display name, diagnostic category = false)
 HA::Button::Generic cleanupButton(&Manager, "Cleanup Device");
 
 void onCleanupButton() {
@@ -14,6 +15,7 @@ void setup() {
   Serial.begin(115200);
   delay(1000);
   
+  // setCommandCallback(function called on button press, with no arguments)
   cleanupButton.setCommandCallback(onCleanupButton);
   
   // ============================================================================
@@ -35,6 +37,7 @@ void setup() {
   //   ⚠️ MUST change back to false to use device again
   //
   // Example removal code:
+  // Manager.begin(device name, manufacturer, model, firmware version, unregister entities = false)
   // bool success = Manager.begin("ESP32_Device", "MyCompany", "ESP32", "1.0.0", true);
   //                                                                              ^^^^
   //                                                                        Set to true
@@ -50,6 +53,7 @@ void setup() {
   //
   // ============================================================================
   
+  // Manager.begin(device name, manufacturer, model, firmware version, unregister entities = false)
   bool success = Manager.begin("ESP32_Device", "MyCompany", "ESP32", "1.0.0", false);
   //                                                                         ^^^^
   //                                                           Change to true to remove

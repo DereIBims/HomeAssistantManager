@@ -1,5 +1,6 @@
 #include "HomeAssistantManager.h"
 #include "Device.h"
+#include <algorithm>
 
 namespace HA {
 
@@ -9,10 +10,18 @@ namespace HA {
       : m_wifiSsid(WiFi_SSID), m_wifiPass(WiFi_PASS), m_mqttServer(MQTT_SERVER), mqttClient(m_wifiClient), m_loglevel(LOG_LEVEL)
   {
     mqttClient.setBufferSize(1024);
+    mqttClient.setSocketTimeout(2);
     mqttClient.setCallback([this](char *t, byte *p, unsigned int l) { m_mqttCallback(t, p, l); });
     String DeviceId = String(ESP.getEfuseMac(), HEX);
     ManagerInfo["identifiers"][0] = DeviceId;
     availTopic = DeviceId + "/available";
+  }
+
+  Manager::~Manager()
+  {
+    for (auto d : m_devices) {
+      d->manager = nullptr;
+    }
   }
 
   void Manager::setMqttPort(uint16_t port)
@@ -79,9 +88,7 @@ namespace HA {
 
     if (m_connect()) {
       if (!unregisterDevices) {
-        m_subsribeTopics();
-        m_registerDevices();
-        m_updateAutoDiag(true);
+        m_restoreDevices();
       }
       else {
         m_unregisterDevices();
@@ -113,7 +120,9 @@ namespace HA {
     }
     hostname += "_" + String(ESP.getEfuseMac(), HEX);
     WiFi.setHostname(hostname.c_str());
+    WiFi.setAutoReconnect(true);
     WiFi.begin(m_wifiSsid, m_wifiPass);
+    m_started = true;
     while (WiFi.status() != WL_CONNECTED) {
       if (millis() - startTime > 30000) { // 30 second timeout
         Log.errorln("");
@@ -132,24 +141,42 @@ namespace HA {
         Log.errorln("MQTT connection timeout.");
         return false;
       }
-      if (mqttClient.connect(String(ESP.getEfuseMac(), HEX).c_str(), m_mqttUser, m_mqttPass, availTopic.c_str(), 1, true, "offline")) {
-        Log.infoln("MQTT connected successfully");
-        // subscribe to all command topics
-      }
-      else {
+      if (!m_connectMqtt()) {
         delay(5000);
       }
     }
 
-    mqttClient.publish(availTopic.c_str(), "online", true);
-
     return true;
+  }
+
+  bool Manager::m_connectMqtt()
+  {
+    m_lastMqttAttempt = millis();
+    if (!mqttClient.connect(Device::getDeviceId().c_str(), m_mqttUser, m_mqttPass, availTopic.c_str(), 1, true, "offline")) {
+      return false;
+    }
+    Log.infoln("MQTT connected successfully");
+    return true;
+  }
+
+  void Manager::m_restoreDevices()
+  {
+    m_registerDevices();
+    m_subsribeTopics();
+    mqttClient.publish(availTopic.c_str(), "online", true);
+    m_updateAutoDiag(true);
   }
 
   void Manager::loop()
   {
+    if (!m_started || WiFi.status() != WL_CONNECTED) {
+      return;
+    }
     if (!mqttClient.connected()) {
-      m_connect(); // Attempt to reconnect
+      if (millis() - m_lastMqttAttempt < 5000 || !m_connectMqtt()) {
+        return;
+      }
+      m_restoreDevices();
     }
     mqttClient.loop();
     m_updateAutoDiag();
@@ -172,6 +199,11 @@ namespace HA {
   void Manager::addDevice(Device *device)
   {
     m_devices.push_back(device);
+  }
+
+  void Manager::removeDevice(Device *device)
+  {
+    m_devices.erase(std::remove(m_devices.begin(), m_devices.end(), device), m_devices.end());
   }
 
   void Manager::m_registerDevices()

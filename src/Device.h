@@ -1,5 +1,8 @@
 #pragma once
-#include "ArduinoJson.h"
+#include <Arduino.h>
+#include <ArduinoJson.h>
+#include <functional>
+#include <utility>
 
 namespace HA {
   class Manager;
@@ -21,7 +24,8 @@ protected:
     String m_deviceType;
     String m_commandTopic = "";
     String m_stateTopic = "";
-    inline static String m_DeviceId = String(ESP.getEfuseMac(), HEX);
+    static const String &getDeviceId();
+    String getTopicBase() const;
     const char *m_name = nullptr;
     const char *m_sensorClass = nullptr;
     const char *m_unit = nullptr;
@@ -30,15 +34,20 @@ protected:
     const char *m_entityCategory = nullptr;
     const char *m_valueTemplate = nullptr;
     void InitDevice();
+    virtual void configureEntity(JsonObject config) {}
+    bool publishState(const char *state, bool retained = false);
     virtual void m_handleCallback(String payload) = 0;
 
 private:
+    String m_entityId;
     void registerEntity();
     void subscribeEntity();
     void unregisterEntity();
 
 public:
     Device(Manager *mgr);
+    virtual ~Device();
+    bool setEntityId(const char *id);
     void setState(const char *STATE);
     void setState(String &STATE);
   };

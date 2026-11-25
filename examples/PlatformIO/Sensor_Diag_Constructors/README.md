@@ -13,7 +13,7 @@ This example demonstrates the use of diagnostic sensors with both predefined and
 1. **Manager Setup**: Initializes the HomeAssistantManager with WiFi and MQTT credentials
 2. **Diagnostic Sensors**: Creates two types of diagnostic sensors:
    - **Battery Level**: Uses predefined `HA::Battery` class with default unit (%)
-   - **Custom Diagnostic**: Uses custom text-based diagnostic with no specific class/unit
+   - **Custom Diagnostic**: Uses a custom text-based diagnostic without a device class, unit, or numeric state class
 3. **Value Updates**: Updates both sensors every 5 seconds
    - Battery: Numeric value (88%)
    - Custom Diag: Text state ("OK")
